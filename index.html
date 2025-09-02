@@ -526,6 +526,101 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        /* Login Page */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+            padding: 40px 0;
+        }
+
+        .auth-card {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .auth-subtitle {
+            color: var(--text-light);
+        }
+
+        /* Dashboard */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(45, 91, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .stat-info h3 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-white);
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .page-btn.active, .page-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
         /* Responsive Design */
         @media (max-width: 992px) {
             .hero-content {
@@ -577,6 +672,10 @@
             
             .appointment-actions {
                 align-self: flex-end;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -646,28 +745,28 @@
                     <p class="section-subtitle">Booking an appointment has never been easier. Just follow these simple steps to see a healthcare professional.</p>
                     
                     <div class="doctors-grid">
-                        <div class="feature-card">
-                            <div class="feature-icon">
+                        <div class="feature-card" style="background: var(--bg-white); padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center;">
+                            <div class="feature-icon" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;">
                                 <i class="fas fa-search"></i>
                             </div>
-                            <h3>Find a Doctor</h3>
-                            <p>Search by specialty, name, or availability to find the right doctor for you.</p>
+                            <h3 style="margin-bottom: 10px;">Find a Doctor</h3>
+                            <p style="color: var(--text-light);">Search by specialty, name, or availability to find the right doctor for you.</p>
                         </div>
                         
-                        <div class="feature-card">
-                            <div class="feature-icon">
+                        <div class="feature-card" style="background: var(--bg-white); padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center;">
+                            <div class="feature-icon" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;">
                                 <i class="far fa-calendar-check"></i>
                             </div>
-                            <h3>Book an Appointment</h3>
-                            <p>Choose a convenient date and time for your appointment.</p>
+                            <h3 style="margin-bottom: 10px;">Book an Appointment</h3>
+                            <p style="color: var(--text-light);">Choose a convenient date and time for your appointment.</p>
                         </div>
                         
-                        <div class="feature-card">
-                            <div class="feature-icon">
+                        <div class="feature-card" style="background: var(--bg-white); padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center;">
+                            <div class="feature-icon" style="font-size: 40px; color: var(--primary); margin-bottom: 15px;">
                                 <i class="fas fa-file-medical"></i>
                             </div>
-                            <h3>Get Treatment</h3>
-                            <p>Visit the doctor and receive the care you need for a healthier life.</p>
+                            <h3 style="margin-bottom: 10px;">Get Treatment</h3>
+                            <p style="color: var(--text-light);">Visit the doctor and receive the care you need for a healthier life.</p>
                         </div>
                     </div>
                 </div>
@@ -690,7 +789,7 @@
                     </div>
                     
                     <div class="doctors-grid">
-                        <div class="doctor-card" v-for="doctor in filteredDoctors" :key="doctor.id">
+                        <div class="doctor-card" v-for="doctor in paginatedDoctors" :key="doctor.id">
                             <div class="doctor-image">
                                 <img :src="doctor.image" :alt="doctor.name" class="doctor-img">
                             </div>
@@ -714,6 +813,21 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="pagination" v-if="filteredDoctors.length > itemsPerPage">
+                        <button class="page-btn" @click="prevPage" :disabled="currentPageNum === 1">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button v-for="page in totalPages" :key="page" 
+                                class="page-btn" 
+                                :class="{ active: currentPageNum === page }"
+                                @click="currentPageNum = page">
+                            {{ page }}
+                        </button>
+                        <button class="page-btn" @click="nextPage" :disabled="currentPageNum === totalPages">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -724,10 +838,13 @@
                     
                     <div class="form-container">
                         <div class="doctor-summary" v-if="selectedDoctor">
-                            <div class="doctor-info">
-                                <h3>{{ selectedDoctor.name }}</h3>
-                                <p>{{ selectedDoctor.specialty }}</p>
-                                <p><i class="fas fa-map-marker-alt"></i> {{ selectedDoctor.location }}</p>
+                            <div class="doctor-info" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                <img :src="selectedDoctor.image" :alt="selectedDoctor.name" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                                <div>
+                                    <h3>{{ selectedDoctor.name }}</h3>
+                                    <p>{{ selectedDoctor.specialty }}</p>
+                                    <p><i class="fas fa-map-marker-alt"></i> {{ selectedDoctor.location }}</p>
+                                </div>
                             </div>
                         </div>
                         
@@ -775,10 +892,10 @@
                 <div class="container">
                     <h2 class="section-title">My Appointments</h2>
                     
-                    <div v-if="appointments.length === 0" class="empty-state">
-                        <i class="far fa-calendar-plus"></i>
-                        <h3>No appointments yet</h3>
-                        <p>Book your first appointment with one of our qualified doctors.</p>
+                    <div v-if="appointments.length === 0" class="empty-state" style="text-align: center; padding: 40px 0;">
+                        <i class="far fa-calendar-plus" style="font-size: 60px; color: var(--text-light); margin-bottom: 20px;"></i>
+                        <h3 style="margin-bottom: 10px;">No appointments yet</h3>
+                        <p style="color: var(--text-light); margin-bottom: 20px;">Book your first appointment with one of our qualified doctors.</p>
                         <button class="btn btn-primary" @click="changePage('doctors')">Find Doctors</button>
                     </div>
                     
@@ -786,7 +903,7 @@
                         <div class="appointment-card" v-for="(appointment, index) in appointments" :key="index">
                             <div class="appointment-info">
                                 <h3 class="appointment-doctor">Dr. {{ appointment.doctor }}</h3>
-                                <p class="appointment-date"><i class="far fa-calendar"></i> {{ appointment.date }} at {{ appointment.time }}</p>
+                                <p class="appointment-date"><i class="far fa-calendar"></i> {{ formatDate(appointment.date) }} at {{ appointment.time }}</p>
                                 <p class="appointment-reason" v-if="appointment.reason">Reason: {{ appointment.reason }}</p>
                                 <span class="appointment-status status-confirmed">Confirmed</span>
                             </div>
@@ -829,6 +946,32 @@
                 </div>
             </section>
 
+            <!-- Login Page -->
+            <section v-if="currentPage === 'login'">
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <div class="auth-header">
+                            <h2 class="auth-title">Doctor Login</h2>
+                            <p class="auth-subtitle">Access your dashboard to view appointments</p>
+                        </div>
+                        
+                        <form @submit.prevent="handleLogin">
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" v-model="loginForm.email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-input" v-model="loginForm.password" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
             <!-- Doctor Dashboard -->
             <section v-if="currentPage === 'dashboard' && isDoctorView">
                 <div class="container">
@@ -840,8 +983,8 @@
                                 <i class="far fa-calendar-check"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>24</h3>
-                                <p>Appointments Today</p>
+                                <h3>{{ doctorAppointments.length }}</h3>
+                                <p>Total Appointments</p>
                             </div>
                         </div>
                         
@@ -850,8 +993,8 @@
                                 <i class="fas fa-user-injured"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>12</h3>
-                                <p>New Patients</p>
+                                <h3>{{ uniquePatients }}</h3>
+                                <p>Unique Patients</p>
                             </div>
                         </div>
                         
@@ -860,20 +1003,20 @@
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div class="stat-info">
-                                <h3>3</h3>
-                                <p>Pending Appointments</p>
+                                <h3>{{ upcomingAppointments }}</h3>
+                                <p>Upcoming Appointments</p>
                             </div>
                         </div>
                     </div>
                     
                     <div class="upcoming-appointments">
-                        <h3>Upcoming Appointments</h3>
+                        <h3 style="margin-bottom: 20px;">Upcoming Appointments</h3>
                         
                         <div class="appointments-list">
                             <div class="appointment-card" v-for="(appointment, index) in doctorAppointments" :key="index">
                                 <div class="appointment-info">
                                     <h3 class="appointment-doctor">{{ appointment.patient }}</h3>
-                                    <p class="appointment-date"><i class="far fa-calendar"></i> {{ appointment.date }} at {{ appointment.time }}</p>
+                                    <p class="appointment-date"><i class="far fa-calendar"></i> {{ formatDate(appointment.date) }} at {{ appointment.time }}</p>
                                     <p class="appointment-reason" v-if="appointment.reason">Reason: {{ appointment.reason }}</p>
                                     <span class="appointment-status status-confirmed">Confirmed</span>
                                 </div>
@@ -1021,6 +1164,10 @@
                     email: '',
                     message: ''
                 },
+                loginForm: {
+                    email: '',
+                    password: ''
+                },
                 doctorAppointments: [
                     {
                         patient: 'John Smith',
@@ -1040,7 +1187,10 @@
                         time: '11:00 AM',
                         reason: 'Back pain'
                     }
-                ]
+                ],
+                // Pagination
+                currentPageNum: 1,
+                itemsPerPage: 4
             },
             computed: {
                 filteredDoctors() {
@@ -1049,14 +1199,32 @@
                     }
                     return this.doctors.filter(doctor => doctor.specialty === this.activeFilter);
                 },
+                paginatedDoctors() {
+                    const start = (this.currentPageNum - 1) * this.itemsPerPage;
+                    const end = start + this.itemsPerPage;
+                    return this.filteredDoctors.slice(start, end);
+                },
+                totalPages() {
+                    return Math.ceil(this.filteredDoctors.length / this.itemsPerPage);
+                },
                 today() {
                     return new Date().toISOString().split('T')[0];
+                },
+                uniquePatients() {
+                    const patients = new Set();
+                    this.doctorAppointments.forEach(app => patients.add(app.patient));
+                    return patients.size;
+                },
+                upcomingAppointments() {
+                    const today = new Date().toISOString().split('T')[0];
+                    return this.doctorAppointments.filter(app => app.date >= today).length;
                 }
             },
             methods: {
                 changePage(page) {
                     this.currentPage = page;
                     this.mobileMenuOpen = false;
+                    this.currentPageNum = 1; // Reset pagination when changing pages
                 },
                 toggleMobileMenu() {
                     this.mobileMenuOpen = !this.mobileMenuOpen;
@@ -1064,17 +1232,21 @@
                 toggleDarkMode() {
                     this.darkMode = !this.darkMode;
                     document.body.classList.toggle('dark-mode', this.darkMode);
+                    localStorage.setItem('darkMode', this.darkMode);
                 },
                 setFilter(specialty) {
                     this.activeFilter = specialty;
+                    this.currentPageNum = 1; // Reset to first page when filtering
                 },
                 searchDoctors() {
                     this.changePage('doctors');
                     // In a real app, this would filter doctors based on searchQuery
                 },
                 bookAppointment(doctor) {
-                    this.selectedDoctor = doctor;
-                    this.changePage('booking');
+                    if (!this.isDoctorView) {
+                        this.selectedDoctor = doctor;
+                        this.changePage('booking');
+                    }
                 },
                 submitBooking() {
                     // Save to appointments
@@ -1086,10 +1258,19 @@
                         reason: this.bookingForm.reason
                     });
                     
+                    // Also add to doctor appointments for demo purposes
+                    this.doctorAppointments.push({
+                        patient: this.bookingForm.name,
+                        date: this.bookingForm.date,
+                        time: this.bookingForm.time,
+                        reason: this.bookingForm.reason
+                    });
+                    
                     // Save to localStorage
                     localStorage.setItem('appointments', JSON.stringify(this.appointments));
+                    localStorage.setItem('doctorAppointments', JSON.stringify(this.doctorAppointments));
                     
-                    // Show confirmation (in a real app, this would be a modal)
+                    // Show confirmation
                     alert('Appointment booked successfully!');
                     
                     // Reset form and redirect
@@ -1118,6 +1299,30 @@
                         email: '',
                         message: ''
                     };
+                },
+                handleLogin() {
+                    // Simple authentication for demo
+                    if (this.loginForm.email === 'doctor@medbook.com' && this.loginForm.password === 'password') {
+                        this.isDoctorView = true;
+                        this.changePage('dashboard');
+                        alert('Login successful!');
+                    } else {
+                        alert('Invalid credentials. Use doctor@medbook.com / password');
+                    }
+                },
+                formatDate(dateString) {
+                    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                    return new Date(dateString).toLocaleDateString(undefined, options);
+                },
+                nextPage() {
+                    if (this.currentPageNum < this.totalPages) {
+                        this.currentPageNum++;
+                    }
+                },
+                prevPage() {
+                    if (this.currentPageNum > 1) {
+                        this.currentPageNum--;
+                    }
                 }
             },
             mounted() {
@@ -1127,9 +1332,34 @@
                     this.appointments = JSON.parse(savedAppointments);
                 }
                 
+                const savedDoctorAppointments = localStorage.getItem('doctorAppointments');
+                if (savedDoctorAppointments) {
+                    this.doctorAppointments = JSON.parse(savedDoctorAppointments);
+                }
+                
+                // Load dark mode preference
+                const savedDarkMode = localStorage.getItem('darkMode');
+                if (savedDarkMode) {
+                    this.darkMode = savedDarkMode === 'true';
+                    document.body.classList.toggle('dark-mode', this.darkMode);
+                }
+                
                 // Check if we're in doctor view (for demo purposes)
                 const urlParams = new URLSearchParams(window.location.search);
                 this.isDoctorView = urlParams.get('view') === 'doctor';
+                
+                // Set up appointment reminders
+                setInterval(() => {
+                    const now = new Date();
+                    const nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+                    
+                    this.appointments.forEach(appointment => {
+                        const appointmentTime = new Date(`${appointment.date}T${appointment.time}`);
+                        if (appointmentTime > now && appointmentTime < nextHour) {
+                            alert(`Reminder: You have an appointment with Dr. ${appointment.doctor} at ${appointment.time}`);
+                        }
+                    });
+                }, 60 * 60 * 1000); // Check every hour
             }
         });
     </script>
