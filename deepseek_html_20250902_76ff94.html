@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedBook - Doctor Appointment System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+        :root {
+            --primary: #2D5BFF;
+            --secondary: #6C87FF;
+            --accent: #FF6B6B;
+            --light: #F8FAFF;
+            --dark: #1A237E;
+            --text: #333333;
+            --text-light: #757575;
+            --bg-white: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        .dark-mode {
+            --primary: #4A6FFF;
+            --secondary: #7C94FF;
+            --accent: #FF8585;
+            --light: #1E1E2E;
+            --dark: #F5F5F5;
+            --text: #E6E6E6;
+            --text-light: #A0A0A0;
+            --bg-white: #252525;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--bg-white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-item {
+            list-style: none;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary);
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 60px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 0 0 var(--radius) var(--radius);
+            margin-bottom: 40px;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            background: var(--bg-white);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 10px;
+            background: transparent;
+            color: var(--text);
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background: var(--secondary);
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .hero-img {
+            max-width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* Section Styling */
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+            color: var(--primary);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            margin-bottom: 50px;
+            color: var(--text-light);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Doctor Cards */
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .doctor-card {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .doctor-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .doctor-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .doctor-card:hover .doctor-img {
+            transform: scale(1.05);
+        }
+
+        .doctor-info {
+            padding: 20px;
+        }
+
+        .doctor-name {
+            font-size: 20px;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .doctor-specialty {
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .doctor-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .doctor-availability {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .slots {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .available {
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            background: var(--bg-white);
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Forms */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--bg-white);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: transparent;
+            color: var(--text);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: transparent;
+            color: var(--text);
+        }
+
+        /* Appointments */
+        .appointments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .appointment-card {
+            background: var(--bg-white);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .appointment-info {
+            flex: 1;
+        }
+
+        .appointment-doctor {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .appointment-date {
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .appointment-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-confirmed {
+            background: #E8F5E9;
+            color: #4CAF50;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-link {
+            margin-bottom: 12px;
+        }
+
+        .footer-link a {
+            color: #ccc;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-link a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            background: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-title {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                background: var(--bg-white);
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+                padding: 20px;
+                box-shadow: var(--shadow);
+                transition: var(--transition);
+            }
+            
+            .nav-menu.active {
+                left: 0;
+            }
+            
+            .nav-item {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .hamburger {
+                display: block;
+            }
+            
+            .doctors-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .appointment-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .appointment-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header & Navigation -->
+        <header>
+            <div class="container nav-container">
+                <div class="logo">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>MedBook</span>
+                </div>
+                
+                <button class="hamburger" @click="toggleMobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <ul class="nav-menu" :class="{ active: mobileMenuOpen }">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" :class="{ active: currentPage === 'home' }" @click="changePage('home')">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" :class="{ active: currentPage === 'doctors' }" @click="changePage('doctors')">Doctors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" :class="{ active: currentPage === 'appointments' }" @click="changePage('appointments')">My Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" :class="{ active: currentPage === 'contact' }" @click="changePage('contact')">Contact</a>
+                    </li>
+                    <li class="nav-item" v-if="isDoctorView">
+                        <a href="#" class="nav-link" :class="{ active: currentPage === 'dashboard' }" @click="changePage('dashboard')">Dashboard</a>
+                    </li>
+                </ul>
+                
+                <button class="theme-toggle" @click="toggleDarkMode">
+                    <i class="fas" :class="darkMode ? 'fa-sun' : 'fa-moon'"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Home Page -->
+            <section v-if="currentPage === 'home'">
+                <div class="hero">
+                    <div class="container hero-content">
+                        <div class="hero-text">
+                            <h1 class="hero-title">Find & Book Appointments with Your Perfect Doctor</h1>
+                            <p class="hero-subtitle">Access to hundreds of healthcare professionals at your fingertips</p>
+                            <div class="search-box">
+                                <input type="text" class="search-input" placeholder="Search doctors by name or specialty..." v-model="searchQuery" @keyup.enter="searchDoctors">
+                                <button class="search-btn" @click="searchDoctors">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="hero-image">
+                            <img src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1080&q=80" alt="Doctor with patient" class="hero-img">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <h2 class="section-title">How It Works</h2>
+                    <p class="section-subtitle">Booking an appointment has never been easier. Just follow these simple steps to see a healthcare professional.</p>
+                    
+                    <div class="doctors-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h3>Find a Doctor</h3>
+                            <p>Search by specialty, name, or availability to find the right doctor for you.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="far fa-calendar-check"></i>
+                            </div>
+                            <h3>Book an Appointment</h3>
+                            <p>Choose a convenient date and time for your appointment.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <h3>Get Treatment</h3>
+                            <p>Visit the doctor and receive the care you need for a healthier life.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Doctors Page -->
+            <section v-if="currentPage === 'doctors'">
+                <div class="container">
+                    <h2 class="section-title">Find Your Doctor</h2>
+                    <p class="section-subtitle">Browse through our network of professional healthcare providers and book an appointment at your convenience.</p>
+                    
+                    <div class="filters">
+                        <button v-for="specialty in specialties" 
+                                :key="specialty" 
+                                class="filter-btn" 
+                                :class="{ active: activeFilter === specialty }"
+                                @click="setFilter(specialty)">
+                            {{ specialty }}
+                        </button>
+                    </div>
+                    
+                    <div class="doctors-grid">
+                        <div class="doctor-card" v-for="doctor in filteredDoctors" :key="doctor.id">
+                            <div class="doctor-image">
+                                <img :src="doctor.image" :alt="doctor.name" class="doctor-img">
+                            </div>
+                            <div class="doctor-info">
+                                <h3 class="doctor-name">{{ doctor.name }}</h3>
+                                <p class="doctor-specialty">{{ doctor.specialty }}</p>
+                                <div class="doctor-details">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ doctor.location }}</span>
+                                </div>
+                                <div class="doctor-details">
+                                    <i class="fas fa-star"></i>
+                                    <span>{{ doctor.rating }} ({{ doctor.reviews }} reviews)</span>
+                                </div>
+                                <div class="doctor-availability">
+                                    <div class="slots">
+                                        <span class="available">{{ doctor.availableSlots }} slots available</span>
+                                    </div>
+                                    <button class="btn btn-primary" @click="bookAppointment(doctor)">Book Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Booking Page -->
+            <section v-if="currentPage === 'booking'">
+                <div class="container">
+                    <h2 class="section-title">Book Appointment</h2>
+                    
+                    <div class="form-container">
+                        <div class="doctor-summary" v-if="selectedDoctor">
+                            <div class="doctor-info">
+                                <h3>{{ selectedDoctor.name }}</h3>
+                                <p>{{ selectedDoctor.specialty }}</p>
+                                <p><i class="fas fa-map-marker-alt"></i> {{ selectedDoctor.location }}</p>
+                            </div>
+                        </div>
+                        
+                        <form @submit.prevent="submitBooking">
+                            <div class="form-group">
+                                <label class="form-label">Your Full Name</label>
+                                <input type="text" class="form-input" v-model="bookingForm.name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-input" v-model="bookingForm.phone" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" v-model="bookingForm.email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Appointment Date</label>
+                                <input type="date" class="form-input" v-model="bookingForm.date" :min="today" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Appointment Time</label>
+                                <select class="form-select" v-model="bookingForm.time" required>
+                                    <option v-for="slot in timeSlots" :key="slot" :value="slot">{{ slot }}</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Reason for Visit (Optional)</label>
+                                <textarea class="form-input" v-model="bookingForm.reason" rows="3"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Confirm Appointment</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Appointments Page -->
+            <section v-if="currentPage === 'appointments'">
+                <div class="container">
+                    <h2 class="section-title">My Appointments</h2>
+                    
+                    <div v-if="appointments.length === 0" class="empty-state">
+                        <i class="far fa-calendar-plus"></i>
+                        <h3>No appointments yet</h3>
+                        <p>Book your first appointment with one of our qualified doctors.</p>
+                        <button class="btn btn-primary" @click="changePage('doctors')">Find Doctors</button>
+                    </div>
+                    
+                    <div v-else class="appointments-list">
+                        <div class="appointment-card" v-for="(appointment, index) in appointments" :key="index">
+                            <div class="appointment-info">
+                                <h3 class="appointment-doctor">Dr. {{ appointment.doctor }}</h3>
+                                <p class="appointment-date"><i class="far fa-calendar"></i> {{ appointment.date }} at {{ appointment.time }}</p>
+                                <p class="appointment-reason" v-if="appointment.reason">Reason: {{ appointment.reason }}</p>
+                                <span class="appointment-status status-confirmed">Confirmed</span>
+                            </div>
+                            <div class="appointment-actions">
+                                <button class="btn btn-outline" @click="cancelAppointment(index)">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Page -->
+            <section v-if="currentPage === 'contact'">
+                <div class="container">
+                    <h2 class="section-title">Contact Us</h2>
+                    <p class="section-subtitle">Have questions or need assistance? Reach out to our support team.</p>
+                    
+                    <div class="form-container">
+                        <form @submit.prevent="submitContact">
+                            <div class="form-group">
+                                <label class="form-label">Your Name</label>
+                                <input type="text" class="form-input" v-model="contactForm.name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" v-model="contactForm.email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Message</label>
+                                <textarea class="form-input" v-model="contactForm.message" rows="5" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Doctor Dashboard -->
+            <section v-if="currentPage === 'dashboard' && isDoctorView">
+                <div class="container">
+                    <h2 class="section-title">Doctor Dashboard</h2>
+                    
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="far fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>24</h3>
+                                <p>Appointments Today</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-user-injured"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>12</h3>
+                                <p>New Patients</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>3</h3>
+                                <p>Pending Appointments</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="upcoming-appointments">
+                        <h3>Upcoming Appointments</h3>
+                        
+                        <div class="appointments-list">
+                            <div class="appointment-card" v-for="(appointment, index) in doctorAppointments" :key="index">
+                                <div class="appointment-info">
+                                    <h3 class="appointment-doctor">{{ appointment.patient }}</h3>
+                                    <p class="appointment-date"><i class="far fa-calendar"></i> {{ appointment.date }} at {{ appointment.time }}</p>
+                                    <p class="appointment-reason" v-if="appointment.reason">Reason: {{ appointment.reason }}</p>
+                                    <span class="appointment-status status-confirmed">Confirmed</span>
+                                </div>
+                                <div class="appointment-actions">
+                                    <button class="btn btn-outline">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-column">
+                        <h3>About MedBook</h3>
+                        <p>MedBook is a platform that connects patients with healthcare providers, making it easy to book appointments and manage healthcare needs.</p>
+                        <div class="footer-social">
+                            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h3>Quick Links</h3>
+                        <ul class="footer-links">
+                            <li class="footer-link"><a href="#" @click="changePage('home')">Home</a></li>
+                            <li class="footer-link"><a href="#" @click="changePage('doctors')">Find Doctors</a></li>
+                            <li class="footer-link"><a href="#" @click="changePage('appointments')">My Appointments</a></li>
+                            <li class="footer-link"><a href="#" @click="changePage('contact')">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h3>Contact Info</h3>
+                        <ul class="footer-links">
+                            <li class="footer-link"><i class="fas fa-map-marker-alt"></i> 123 Medical Drive, Health City</li>
+                            <li class="footer-link"><i class="fas fa-phone"></i> (123) 456-7890</li>
+                            <li class="footer-link"><i class="fas fa-envelope"></i> info@medbook.com</li>
+                            <li class="footer-link"><i class="fas fa-clock"></i> Mon-Fri: 8:00 AM - 6:00 PM</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p>&copy; 2023 MedBook. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                currentPage: 'home',
+                mobileMenuOpen: false,
+                darkMode: false,
+                isDoctorView: false,
+                searchQuery: '',
+                activeFilter: 'all',
+                specialties: ['All', 'Cardiologist', 'Dermatologist', 'Pediatrician', 'Orthopedist', 'Dentist'],
+                doctors: [
+                    {
+                        id: 1,
+                        name: 'Dr. Sarah Johnson',
+                        specialty: 'Cardiologist',
+                        location: 'Medical Center, Floor 3',
+                        rating: '4.9',
+                        reviews: 128,
+                        availableSlots: 5,
+                        image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 2,
+                        name: 'Dr. Michael Chen',
+                        specialty: 'Dermatologist',
+                        location: 'Skin Health Center, Floor 2',
+                        rating: '4.8',
+                        reviews: 96,
+                        availableSlots: 3,
+                        image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 3,
+                        name: 'Dr. Emily Rodriguez',
+                        specialty: 'Pediatrician',
+                        location: 'Children\'s Wing, Floor 1',
+                        rating: '4.95',
+                        reviews: 152,
+                        availableSlots: 7,
+                        image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 4,
+                        name: 'Dr. James Wilson',
+                        specialty: 'Orthopedist',
+                        location: 'Bone & Joint Center, Floor 4',
+                        rating: '4.7',
+                        reviews: 87,
+                        availableSlots: 2,
+                        image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 5,
+                        name: 'Dr. Lisa Patel',
+                        specialty: 'Dentist',
+                        location: 'Dental Suite, Floor 1',
+                        rating: '4.85',
+                        reviews: 114,
+                        availableSlots: 4,
+                        image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 6,
+                        name: 'Dr. Robert Kim',
+                        specialty: 'Cardiologist',
+                        location: 'Heart Center, Floor 3',
+                        rating: '4.9',
+                        reviews: 134,
+                        availableSlots: 6,
+                        image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80'
+                    }
+                ],
+                selectedDoctor: null,
+                bookingForm: {
+                    name: '',
+                    phone: '',
+                    email: '',
+                    date: '',
+                    time: '',
+                    reason: ''
+                },
+                timeSlots: ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'],
+                appointments: [],
+                contactForm: {
+                    name: '',
+                    email: '',
+                    message: ''
+                },
+                doctorAppointments: [
+                    {
+                        patient: 'John Smith',
+                        date: '2023-06-15',
+                        time: '10:00 AM',
+                        reason: 'Annual checkup'
+                    },
+                    {
+                        patient: 'Emma Davis',
+                        date: '2023-06-15',
+                        time: '2:00 PM',
+                        reason: 'Skin consultation'
+                    },
+                    {
+                        patient: 'Robert Johnson',
+                        date: '2023-06-16',
+                        time: '11:00 AM',
+                        reason: 'Back pain'
+                    }
+                ]
+            },
+            computed: {
+                filteredDoctors() {
+                    if (this.activeFilter === 'all') {
+                        return this.doctors;
+                    }
+                    return this.doctors.filter(doctor => doctor.specialty === this.activeFilter);
+                },
+                today() {
+                    return new Date().toISOString().split('T')[0];
+                }
+            },
+            methods: {
+                changePage(page) {
+                    this.currentPage = page;
+                    this.mobileMenuOpen = false;
+                },
+                toggleMobileMenu() {
+                    this.mobileMenuOpen = !this.mobileMenuOpen;
+                },
+                toggleDarkMode() {
+                    this.darkMode = !this.darkMode;
+                    document.body.classList.toggle('dark-mode', this.darkMode);
+                },
+                setFilter(specialty) {
+                    this.activeFilter = specialty;
+                },
+                searchDoctors() {
+                    this.changePage('doctors');
+                    // In a real app, this would filter doctors based on searchQuery
+                },
+                bookAppointment(doctor) {
+                    this.selectedDoctor = doctor;
+                    this.changePage('booking');
+                },
+                submitBooking() {
+                    // Save to appointments
+                    this.appointments.push({
+                        doctor: this.selectedDoctor.name,
+                        specialty: this.selectedDoctor.specialty,
+                        date: this.bookingForm.date,
+                        time: this.bookingForm.time,
+                        reason: this.bookingForm.reason
+                    });
+                    
+                    // Save to localStorage
+                    localStorage.setItem('appointments', JSON.stringify(this.appointments));
+                    
+                    // Show confirmation (in a real app, this would be a modal)
+                    alert('Appointment booked successfully!');
+                    
+                    // Reset form and redirect
+                    this.bookingForm = {
+                        name: '',
+                        phone: '',
+                        email: '',
+                        date: '',
+                        time: '',
+                        reason: ''
+                    };
+                    
+                    this.changePage('appointments');
+                },
+                cancelAppointment(index) {
+                    if (confirm('Are you sure you want to cancel this appointment?')) {
+                        this.appointments.splice(index, 1);
+                        localStorage.setItem('appointments', JSON.stringify(this.appointments));
+                    }
+                },
+                submitContact() {
+                    // In a real app, this would send the message to a server
+                    alert('Thank you for your message. We will get back to you soon!');
+                    this.contactForm = {
+                        name: '',
+                        email: '',
+                        message: ''
+                    };
+                }
+            },
+            mounted() {
+                // Load appointments from localStorage
+                const savedAppointments = localStorage.getItem('appointments');
+                if (savedAppointments) {
+                    this.appointments = JSON.parse(savedAppointments);
+                }
+                
+                // Check if we're in doctor view (for demo purposes)
+                const urlParams = new URLSearchParams(window.location.search);
+                this.isDoctorView = urlParams.get('view') === 'doctor';
+            }
+        });
+    </script>
+</body>
+</html>
